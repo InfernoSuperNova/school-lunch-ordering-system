@@ -687,6 +687,10 @@ void paymentStatus() {
 	billingDataBase.close();
 
 
+					if (userChoice == 1) {
+
+						
+					}
 }
 
 void editMenu() {
