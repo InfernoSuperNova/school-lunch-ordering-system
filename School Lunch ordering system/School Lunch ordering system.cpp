@@ -64,6 +64,7 @@ void editMenu();
 int main()
 {
 	string username = "juzzitube";
+
 	paymentStatus(username);
 	/*editMenu();
 	int selection;
@@ -273,6 +274,12 @@ vector<vector<string>> csvToVector(string fileName) {
 		output.push_back(row); //adds each row to the vector
 	}
 	csvFile.close();
+	//for (vector<string> row : output) {
+	//	for (string word : row) {
+	//		std::cout << word << "\t";
+	//	}
+	//	std::cout << "\n";
+	//}
 	return output;
 
 }
@@ -407,6 +414,7 @@ void orderMenu(string username) {
 
 		switch (userChoice) {
 		case 1:
+			//
 			cout << "Enter Quantity: ";
 			cin >> quantityOne;
 			totalPrice = quantityOne * itemOnePrice;
@@ -416,6 +424,7 @@ void orderMenu(string username) {
 			cout << "Added to Cart\n";
 			break;
 		case 2:
+			//
 			cout << "Enter Quantity: ";
 			cin >> quantityTwo;
 			totalPrice = quantityTwo * itemTwoPrice;
@@ -443,12 +452,12 @@ void orderMenu(string username) {
 			break;
 		case 6:
 			menuDataBase.close();
-			userMainMenu(username);
+			return;
 		default:
 			cout << "Please select a valid option.\n";
 			break;
 		}
-	} while (userChoice != 5 || 6);
+	} while (userChoice != 7);
 }
 
 void cartOpen(string username) {
@@ -620,9 +629,10 @@ void feedbackForm(string username) {
 	cout << "Write your feedback: \n";
 	std::getline (std::cin,feedback);
 	feedbackDataBase << feedback << "\n";
-	cout << "Thank you, your feedback has been sent.\n";
+	cout << "Thank you, your feedback has been sent.\n\n\n";
 	feedbackDataBase.close();
-	return;
+
+	userMainMenu(username);
 }
 
 void billingHistory(string username) {
@@ -669,41 +679,49 @@ void paymentStatus(string username) {
 	
 				vector<vector<string>> fileContent = csvToVector("billingDataBase");
 				for (int i = 0; i < fileContent.size(); i++) {
-					for(int j = 0; j < fileContent[i].size(); j++)
-					cout << fileContent[i][j];
-					if (fileContent[2][0] == username) {
-						cout << fileContent[i][6];
-						paymentStatus = fileContent[i][6];
-						cout << paymentStatus;
+					for (int j = 0; j < fileContent[i].size(); j++) {
+						cout << fileContent[i][j] << "\t";
 					}
-					if (paymentStatus == "unpaid") {
-						cout << "Your payment status is unpaid. You owe: " << fileContent[i][5] << "$\n";
-						cout << "Do you want to pay now?\n";
-						cout << "1) Yes\n2) No: ";
-					}
-
-					do {
-						cin >> userChoice;
-						switch (userChoice) {
-						case 1:
-							paymentStatus = "paid";
-							fileContent[i][6] = paymentStatus;
-							cout << "Payment complete. Your payment status has been updated.\n";
-							clearFile("billingDataBase");
-							beamVectorToFile(fileContent, "billingDataBase");
-							break;
-						case 2:
-							cout << "Your payment status will remain unpaid\n";
-							break;
-						default:
-							cout << "Please select a valid option\n";
-							break;
-						}
-					} while (userChoice != 1 | 2);
-
-
+					std::cout << "\n";
 				}
-}
+
+
+				for (int i = 0; i < fileContent.size(); i++) {
+					for (int j = 0; j < fileContent.at(i).size(); j++) {
+
+						if (fileContent[i][2] == username) {
+							cout << fileContent[i][6];
+							paymentStatus = fileContent[i][6];
+							cout << paymentStatus;
+						}
+						if (paymentStatus == "unpaid") {
+							cout << "Your payment status is unpaid. You owe: " << fileContent[i][5] << "$\n";
+							cout << "Do you want to pay now?\n";
+						}
+
+
+						do {
+							cout << "1) Yes\n2) No: ";
+							cin >> userChoice;
+							switch (userChoice) {
+							case 1:
+								paymentStatus = "paid";
+								fileContent[i][6] = paymentStatus;
+								cout << "Payment complete. Your payment status has been updated.\n";
+								clearFile("billingDataBase");
+								beamVectorToFile(fileContent, "billingDataBase");
+								break;
+							case 2:
+								cout << "Your payment status will remain unpaid\n";
+								break;
+							default:
+								cout << "Please select a valid option\n";
+								break;
+							}
+						} while (userChoice < 0 || userChoice > 2);
+					}
+					}
+				}
 
 //void editMenu() {
 //	int i = 1, input;
