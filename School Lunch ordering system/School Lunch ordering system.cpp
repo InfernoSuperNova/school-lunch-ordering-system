@@ -1,5 +1,5 @@
 // School Lunch ordering system.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
+// up to date as of 11/11/2022 1333
 
 #include <iostream> //Needed to input and output
 #include <fstream> //Enables file functionality 
@@ -11,7 +11,7 @@
 using std::string;
 using std::cout;
 using std::cin;
-using std::ios;           
+using std::ios;
 using std::vector;
 using std::fstream;
 using std::stringstream;
@@ -43,26 +43,29 @@ void login();
 
 vector<vector<string>> csvToVector(string fileName);
 
-void userMainMenu();
+void userMainMenu(string username);
 
-void orderMenu();
+void orderMenu(string username);
 
-void paymentWindow();
+void paymentWindow(string username);
 
-void feedbackForm();
-	
-void billingHistory();
+void feedbackForm(string username);
 
-void cartOpen();
+void billingHistory(string username);
 
-void paymentStatus();
+void userBillingHistory(string username);
+
+void cartOpen(string username);
+
+void paymentStatus(string username);
 
 void editMenu();
 
 int main()
 {
-
-	editMenu();
+	string username = "juzzitube";
+	paymentStatus(username);
+	/*editMenu();
 	int selection;
 	cout << "oi mate ya wanna register(0) or login(1) bro???\n";
 	cin >> selection;
@@ -73,7 +76,7 @@ int main()
 	case 1:
 		login();
 		break;
-	}
+	}*/
 	//paymentStatus();
 
 }
@@ -199,6 +202,7 @@ string appendForTable(string toBeAddedTo, string added) {
 	toBeAddedTo.append(added);
 	return toBeAddedTo;
 }
+
 //Sends the information to the file
 void beamStringToFile(string input, string fileToBeamTo) {
 	fstream file(fileToBeamTo + ".csv", ios::in | ios::app);
@@ -221,10 +225,16 @@ void clearFile(string filename) {
 	file.open(filename + ".csv", ios::out | ios::trunc);
 	file.close();
 }
+
 void beamVectorToFile(vector<vector<string>> input, string filename) {
 	string output;
 	for (vector<string> row : input) {
+
 		output = appendForTable(row.at(0), row.at(1));
+		output = row.at(0);
+		for (int i = 1; i < row.size(); i++) {
+			output = output + "," + row.at(i);
+		}
 		beamStringToFile(output, filename);
 	}
 }
@@ -235,7 +245,7 @@ void beamVectorToFile(vector<vector<string>> input, string filename) {
 //Arguments: Name of file to open, without extension
 //Returns: Vector conversion of CSV document
 vector<vector<string>> csvToVector(string fileName) {
-	
+
 	string line, word;
 	vector<string> row; //Stores data of current row
 	vector<vector<string>> output; //2D vector for storing 
@@ -288,7 +298,7 @@ void login() {
 			switch (stoi(row.at(2))) {							//Checks the third cell, which tells the program whether the user is standard or an admin
 			case 0:
 				cout << "logged in as user" << '\n';
-				userMainMenu();
+				userMainMenu(username);
 				break;
 			case 1:
 				cout << "logged in as admin" << '\n';
@@ -298,7 +308,7 @@ void login() {
 	}
 }
 
-void userMainMenu() {
+void userMainMenu(string username) {
 	//Outputs main menu options to a logged in user.
 
 	int userChoice;
@@ -314,13 +324,13 @@ void userMainMenu() {
 
 		switch (userChoice) {
 		case 1:
-			orderMenu();
+			orderMenu(username);
 			break;
 		case 2:
-			billingHistory();
+			billingHistory(username);
 			break;
 		case 3:
-			feedbackForm();
+			feedbackForm(username);
 			break;
 		case 4:
 			cout << "Logged out";
@@ -333,7 +343,7 @@ void userMainMenu() {
 	} while (userChoice != 4);
 }
 
-void orderMenu() {
+void orderMenu(string username) {
 	//outputs order menu for user's and leads to 'paymentwindow' and 'cartopen' functions
 
 	int userChoice;
@@ -360,7 +370,7 @@ void orderMenu() {
 	}
 
 	do {
-		//outputs filecontent vector has menu options
+		//outputs filecontent vector menu options
 		cout << "Select option: \n\n";
 
 		cout << "1) " << fileContent[0][0] << " " << fileContent[0][1] << "$\n";
@@ -393,7 +403,7 @@ void orderMenu() {
 		cin >> userChoice;
 		menuDataBase.close();
 
-		cart.open("cart.csv", ios::out | ios::app | ios::in | ios::beg );
+		cart.open("cart.csv", ios::out | ios::app | ios::in | ios::beg);
 
 		switch (userChoice) {
 		case 1:
@@ -425,15 +435,15 @@ void orderMenu() {
 			cout << "Added to Cart\n";
 			break;
 		case 4:
-			cartOpen();
+			cartOpen(username);
 			break;
 		case 5:
 			menuDataBase.close();
-			paymentWindow();
+			paymentWindow(username);
 			break;
 		case 6:
 			menuDataBase.close();
-			userMainMenu();
+			userMainMenu(username);
 		default:
 			cout << "Please select a valid option.\n";
 			break;
@@ -441,7 +451,7 @@ void orderMenu() {
 	} while (userChoice != 5 || 6);
 }
 
-void cartOpen() {
+void cartOpen(string username) {
 	//outputs cart content to user and gives user the option to proceed to payment, clear cart or return to order menu.
 
 	string line, word;
@@ -485,7 +495,7 @@ void cartOpen() {
 	switch (userChoice) {
 	case 1:
 		cart.close();
-		paymentWindow();
+		paymentWindow(username);
 		break;
 	case 2:
 		cart.close();
@@ -496,11 +506,11 @@ void cartOpen() {
 		}
 		cout << "Cart has been cleared\n";
 		cart.close();
-		cartOpen();//re-opens cart function with the cart now cleared.
+		cartOpen(username);//re-opens cart function with the cart now cleared.
 		break;
 	case 3:
 		cart.close();
-		orderMenu();
+		orderMenu(username);
 		break;
 	}
 
@@ -508,14 +518,14 @@ void cartOpen() {
 
 }
 
-void paymentWindow() {
-	//retrieve username, cart information and userinputs and push into billing database.
+void paymentWindow(string username) {
+	//retrieve username, cart information and userinputs and pushes into billing database.
 
 	cout << "paymentwindow\n\n\n";
 	int userChoice;
 	fstream billingDataBase;
 	fstream cart;
-		
+
 	cart.open("cart.csv", ios::in); //cart outputs and stores data to be extracted and stored in billing database.
 	if (!cart.is_open()) {
 		cout << "file not open";
@@ -553,11 +563,9 @@ void paymentWindow() {
 
 	totalPrice = accumulate(totalCalc.begin(), totalCalc.end(), 0.0); //calculates sum of 'totalcalc' vector and stores in 'totalPrice' variable to then be stored in billingDatabase.
 
-	string username, date, childName, dietaryPref, paymentStatus;
+	string date, childName, dietaryPref, paymentStatus;
 	int roomNumber;
 
-	cout << "Enter your username: ";
-	cin >> username;
 	cout << "\nEnter the date (dd/mm/yyyy): ";
 	cin >> date;
 	cout << "\nEnter the child you want to sent the order to: ";
@@ -581,26 +589,28 @@ void paymentWindow() {
 	}
 
 	billingDataBase.open("billingDataBase.csv", ios::app);
-if (!billingDataBase.is_open()) {
-	cout << "file not open";
-	return;
-}
+	if (!billingDataBase.is_open()) {
+		cout << "file not open";
+		return;
+	}
 
-username = removeComma(username);
-date = removeComma(date);
-childName = removeComma(childName);
-billingDataBase << username << "," << date << "," << childName << "," << roomNumber << "," << dietaryPref << "," << totalPrice << "," << paymentStatus << "\n";
-		
+	username = removeComma(username);
+	date = removeComma(date);
+	childName = removeComma(childName);
+	dietaryPref = removeComma(dietaryPref);
+
+	billingDataBase << username << "," << date << "," << childName << "," << roomNumber << "," << dietaryPref << "," << totalPrice << "," << paymentStatus << "\n";
+
 	billingDataBase.close();
-	userMainMenu();
+	userMainMenu(username);
 }
 
-void feedbackForm() {
+void feedbackForm(string username) {
 	int userChoice;
-	string feedback;
 	fstream feedbackDataBase("feedbackDataBase.txt", ios::app);
 
 	cout << "****Feedback****\n\n";
+	string feedback;
 
 	if (!feedbackDataBase.is_open()) {
 		cout << "file is not open\n";
@@ -608,14 +618,14 @@ void feedbackForm() {
 	}
 
 	cout << "Write your feedback: \n";
-	cin >> feedback;
-	feedbackDataBase << feedback << ",";
+	std::getline (std::cin,feedback);
+	feedbackDataBase << feedback << "\n";
 	cout << "Thank you, your feedback has been sent.\n";
 	feedbackDataBase.close();
 	return;
 }
 
-void billingHistory() {
+void billingHistory(string username) {
 
 	cout << "\n\n****Billing****\n\n";
 
@@ -627,123 +637,125 @@ void billingHistory() {
 
 	switch (userChoice) {
 	case 1:
-		paymentStatus();
+		paymentStatus(username);
 		break;
-	case 2: 
+	case 2:
 
 		break;
 	case 3:
-		userMainMenu();
+		userMainMenu(username);
 		break;
 	}
 }
 
-void paymentStatus() {
+void userBillingHistory(string username) {
+	cout << "Your billing history: \n\n";
 
-	string username;
-	string paymentStatus;
-	float amountOwed;
-	int userChoice;
-
-	fstream billingDataBase;
-	billingDataBase.open("billingDataBase.csv", ios::in | ios::beg);
-
-	string line, word;
-	vector<string> row;
-	vector <vector<string>> fileContent;
-
-	if (!billingDataBase.is_open()) {
-		cout << "File failed to open\n";
-	}
-
-	while (getline(billingDataBase, line, '\n')) {
-		row.clear();
-		stringstream stream(line);
-		while (getline(stream, word, ',')) {
-			row.push_back(word);
-		}
-		fileContent.push_back(row);
-	}
-
-	cout << "\nEnter your username: ";
-	cin >> username;
+	vector<vector<string>> fileContent = csvToVector("billingDataBase");
 
 	for (int i = 0; i < fileContent.size(); i++) {
 		if (fileContent[i][0] == username) {
-			paymentStatus = fileContent[i][6];
-			if (paymentStatus == "unpaid") {
-				cout << "Your payment status is unpaid. You owe: " << fileContent[i][5] << "$\n";
-				cout << "Do you want to pay now?\n";
-				cout << "1) Yes\n2) No: ";
-				cin >> userChoice;
-
-				if (userChoice == 1) {
-						
-				}
-			}
+			cout << "Date: " << fileContent[i][1] << "\tAmount spent: " << fileContent[i][5] << "\tStatus: " << fileContent[i][6] << endl;
 		}
 	}
-
-	billingDataBase.close();
-
-
-					if (userChoice == 1) {
-
-						
-					}
 }
 
-void editMenu() {
-	int i = 1, input;
-	string newVal;
-	vector<vector<string>> menu = csvToVector("menuDataBase");
-	cout << "Current menu: \n";
-	for (vector<string> row : menu) {//FOR loop that iterates through each line of the vector array
-		cout << "(" << i++ << ") " << row.at(0) << "\t$" << row.at(1) << "\n";
-	}
-	cout << "\nWould you like to edit(1) or exit(2)?";
-	cin >> input;
-	switch (input) {
-	case 1:
-		cout << "select which one you want to edit: ";
-		cin >> input;
+void paymentStatus(string username) {
 
-		i = 1;
-		for (vector<string> row : menu) {
-			if (i == input) {
-				cout << row.at(0) << "\t$" << row.at(1)
-					<< "\nEdit name(1) or price(2)?";
-				cin >> input;
-				switch (input) {
-				case 1:
-					cout << "Please enter a new name: ";
-					cin >> newVal;
-					row.at(0) = newVal;
-					menu[i - 1] = row;
-					clearFile("menuDataBase");
-					beamVectorToFile(menu, "menuDataBase");
-					break;
-					
-				case 2:
-					cout << "Please enter a new price (excluding $ character): ";
-					cin >> newVal;
-					row.at(1) = newVal;
-					menu[i - 1] = row;
-					clearFile("menuDataBase");
-					beamVectorToFile(menu, "menuDataBase");
-					break;
-				}
-			}
-			i++; 
-		}
-		break;
-	case 2:
-		cout << "Cya admin bro";
-		return;
-	}
-
+				string paymentStatus;
+				float amountOwed;
+				int userChoice;
+				username = "juzzitube";
 	
+				vector<vector<string>> fileContent = csvToVector("billingDataBase");
+				for (int i = 0; i < fileContent.size(); i++) {
+					for(int j = 0; j < fileContent[i].size(); j++)
+					cout << fileContent[i][j];
+					if (fileContent[2][0] == username) {
+						cout << fileContent[i][6];
+						paymentStatus = fileContent[i][6];
+						cout << paymentStatus;
+					}
+					if (paymentStatus == "unpaid") {
+						cout << "Your payment status is unpaid. You owe: " << fileContent[i][5] << "$\n";
+						cout << "Do you want to pay now?\n";
+						cout << "1) Yes\n2) No: ";
+					}
+
+					do {
+						cin >> userChoice;
+						switch (userChoice) {
+						case 1:
+							paymentStatus = "paid";
+							fileContent[i][6] = paymentStatus;
+							cout << "Payment complete. Your payment status has been updated.\n";
+							clearFile("billingDataBase");
+							beamVectorToFile(fileContent, "billingDataBase");
+							break;
+						case 2:
+							cout << "Your payment status will remain unpaid\n";
+							break;
+						default:
+							cout << "Please select a valid option\n";
+							break;
+						}
+					} while (userChoice != 1 | 2);
+
+
+				}
 }
+
+//void editMenu() {
+//	int i = 1, input;
+//	string newVal;
+//	vector<vector<string>> menu = csvToVector("menuDataBase");
+//	cout << "Current menu: \n";
+//	for (vector<string> row : menu) {//FOR loop that iterates through each line of the vector array
+//		cout << "(" << i++ << ") " << row.at(0) << "\t$" << row.at(1) << "\n";
+//	}
+//	cout << "\nWould you like to edit(1) or exit(2)?";
+//	cin >> input;
+//	switch (input) {
+//	case 1:
+//		cout << "select which one you want to edit: ";
+//		cin >> input;
+//
+//		i = 1;
+//		for (vector<string> row : menu) {
+//			if (i == input) {
+//				cout << row.at(0) << "\t$" << row.at(1)
+//					<< "\nEdit name(1) or price(2)?";
+//				cin >> input;
+//				switch (input) {
+//				case 1:
+//					cout << "Please enter a new name: ";
+//					cin >> newVal;
+//					row.at(0) = newVal;
+//					menu[i - 1] = row;
+//					clearFile("menuDataBase");
+//					beamVectorToFile(menu, "menuDataBase");
+//					break;
+//
+//				case 2:
+//					cout << "Please enter a new price (excluding $ character): ";
+//					cin >> newVal;
+//					row.at(1) = newVal;
+//					menu[i - 1] = row;
+//					clearFile("menuDataBase");
+//					beamVectorToFile(menu, "menuDataBase");
+//					break;
+//				}
+//			}
+//			i++;
+//		}
+//		break;
+//	case 2:
+//		cout << "Cya admin bro";
+//		return;
+//	}
+//
+//
+//}
 
 
 

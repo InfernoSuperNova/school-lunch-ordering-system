@@ -1,4 +1,6 @@
 ﻿  School Lunch ordering system.cpp
-C:\Users\270155294\OneDrive - UP Education\Desktop\foobar_group_assignment_103\school-lunch-ordering-system\School Lunch ordering system\School Lunch ordering system.cpp(599,6): warning C4101: 'userChoice': unreferenced local variable
-C:\Users\270155294\OneDrive - UP Education\Desktop\foobar_group_assignment_103\school-lunch-ordering-system\School Lunch ordering system\School Lunch ordering system.cpp(645,8): warning C4101: 'amountOwed': unreferenced local variable
-  School Lunch ordering system.vcxproj -> C:\Users\270155294\OneDrive - UP Education\Desktop\foobar_group_assignment_103\school-lunch-ordering-system\x64\Debug\School Lunch ordering system.exe
+C:\Users\270211292\Documents\Github\school-lunch-ordering-system\School Lunch ordering system\School Lunch ordering system.cpp(609,6): warning C4101: 'userChoice': unreferenced local variable
+C:\Users\270211292\Documents\Github\school-lunch-ordering-system\School Lunch ordering system\School Lunch ordering system.cpp(702,33): warning C4806: '|': unsafe operation: no value of type 'bool' promoted to type 'int' can equal the given constant
+C:\Users\270211292\Documents\Github\school-lunch-ordering-system\School Lunch ordering system\School Lunch ordering system.cpp(702,34): warning C4554: '|': check operator precedence for possible error; use parentheses to clarify precedence
+C:\Users\270211292\Documents\Github\school-lunch-ordering-system\School Lunch ordering system\School Lunch ordering system.cpp(666,11): warning C4101: 'amountOwed': unreferenced local variable
+  School Lunch ordering system.vcxproj -> C:\Users\270211292\Documents\Github\school-lunch-ordering-system\x64\Debug\School Lunch ordering system.exe
