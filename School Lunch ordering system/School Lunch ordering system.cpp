@@ -8,6 +8,7 @@
 #include <vector>
 #include<numeric> //used to calculcate sum of a vector
 #include <cstdio>
+#include <limits>
 using std::string;
 using std::cout;
 using std::cin;
@@ -63,11 +64,12 @@ void editMenu();
 
 int main()
 {
-	string username = "juzzitube";
+	string username = "rainstormo";
 
-	paymentStatus(username);
-	/*editMenu();
-	int selection;
+	//feedbackForm(username);
+	userMainMenu(username);
+
+	/*int selection;
 	cout << "oi mate ya wanna register(0) or login(1) bro???\n";
 	cin >> selection;
 	switch (selection) {
@@ -78,7 +80,6 @@ int main()
 		login();
 		break;
 	}*/
-	//paymentStatus();
 
 }
 //--------------------------------------------------------------------------------------------------------------
@@ -119,6 +120,8 @@ void registerUser() {
 	info2 = appendForTable(info2, "0");
 	info2 = info2 + "," + info;
 	beamStringToFile(info2, "userDataBase");
+
+	login();
 }
 
 //handles guardian registration
@@ -319,29 +322,34 @@ void userMainMenu(string username) {
 	//Outputs main menu options to a logged in user.
 
 	int userChoice;
-
-	cout << "******Logged in******\n";
-	cout << "Main Menu\n\n";
+	cout << "***Logged in***\n";
 
 	do {
-		cout << "Select option: \n";
-		cout << "1)Order menu\n2)Billing History\n3)Provide Feedback\n4)Logout\n";
-		cin >> userChoice;
+		system("cls");
+		cout << "\nMain Menu\n\n";
 
+		cout << "Select option: \n";
+		cout << "1)Order menu\n2)Billing\n3)Provide Feedback\n4)Logout\n";
+		cin >> userChoice;
+			system("cls");
 
 		switch (userChoice) {
 		case 1:
+			//Takes user to the order menu.
 			orderMenu(username);
 			break;
 		case 2:
+			//Takes user to view their 'billing history' 
 			billingHistory(username);
 			break;
 		case 3:
+			//Takes user to where they can provide feedback.
 			feedbackForm(username);
 			break;
 		case 4:
-			cout << "Logged out";
-			void login();
+			//Takes user back to login.
+			cout << "Logged out\n";
+			main();
 			break;
 		default:
 			cout << "Please select a valid option\n";
@@ -354,6 +362,8 @@ void orderMenu(string username) {
 	//outputs order menu for user's and leads to 'paymentwindow' and 'cartopen' functions
 
 	int userChoice;
+
+do {
 	fstream menuDataBase;
 	fstream cart;
 
@@ -375,9 +385,8 @@ void orderMenu(string username) {
 		}
 		fileContent.push_back(row);
 	}
-
-	do {
-		//outputs filecontent vector menu options
+	
+		//outputs three menu items and their prices.
 		cout << "Select option: \n\n";
 
 		cout << "1) " << fileContent[0][0] << " " << fileContent[0][1] << "$\n";
@@ -408,56 +417,59 @@ void orderMenu(string username) {
 		double totalPrice; //multiplies quantity with price in each switch case, and outputs equation to 'cart.csv' file.
 
 		cin >> userChoice;
+		system("cls");
 		menuDataBase.close();
 
-		cart.open("cart.csv", ios::out | ios::app | ios::in | ios::beg);
+		cart.open("cart.csv", ios::app | ios::in);
 
 		switch (userChoice) {
 		case 1:
-			//
+			// Case 1, 2 and 3 match menu items 1, 2 and 3. Each item's price is multiplied by quanity and pushed into the cart csv file.
 			cout << "Enter Quantity: ";
 			cin >> quantityOne;
-			totalPrice = quantityOne * itemOnePrice;
-			cout << totalPrice;
+			totalPrice = quantityOne * itemOnePrice; 
+			//cout << "\n" << "$" << totalPrice;
 			cart << itemOne << "," << quantityOne << "," << totalPrice << '\n';
 			cart.close();
-			cout << "Added to Cart\n";
+			cout << "\n\nAdded to Cart\n\n\n";
 			break;
 		case 2:
 			//
 			cout << "Enter Quantity: ";
 			cin >> quantityTwo;
 			totalPrice = quantityTwo * itemTwoPrice;
-			cout << totalPrice;
+			//cout << totalPrice;
 			cart << itemTwo << "," << quantityTwo << "," << totalPrice << '\n';
 			cart.close();
-			cout << "Added to Cart\n";
-
+			cout << "\n\nAdded to Cart\n\n\n";
 			break;
 		case 3:
 			cout << "Enter Quantity: ";
 			cin >> quantityThree;
 			totalPrice = quantityThree * itemThreePrice;
-			cout << totalPrice;
+			//cout << totalPrice;
 			cart << itemThree << "," << quantityThree << "," << totalPrice << '\n';
 			cart.close();
-			cout << "Added to Cart\n";
+			cout << "\n\nAdded to Cart\n\n\n";
 			break;
 		case 4:
+			//Allows user's to view their cart
 			cartOpen(username);
 			break;
 		case 5:
+			//Proceeds user to payment window once confirming their menu items.
 			menuDataBase.close();
 			paymentWindow(username);
 			break;
 		case 6:
+			//returns user to the main menu.
 			menuDataBase.close();
 			return;
 		default:
 			cout << "Please select a valid option.\n";
 			break;
 		}
-	} while (userChoice != 7);
+	} while (userChoice != 6);
 }
 
 void cartOpen(string username) {
@@ -498,42 +510,55 @@ void cartOpen(string username) {
 
 	cout << "\n\n";
 	cout << "1)Proceed to payment\n2)Clear cart\n3)Back to order menu\n";
+	do{
+		cin >> userChoice;
 
-	cin >> userChoice;
-
-	switch (userChoice) {
-	case 1:
-		cart.close();
-		paymentWindow(username);
-		break;
-	case 2:
-		cart.close();
-		cart.open("cart.csv", ios::out | ios::trunc); //clears database
-		if (!cart.is_open()) {
-			cout << "file not open";
+		switch (userChoice) {
+		case 1:
+			//Allows user to confirm their cart choices and proceed to payment.
+			cart.close();
+			if (fileContent.size() == 0) {
+				cout << "\n\nYour have nothing in the cart, returning to order menu.\n";
+					return;
+			}
+			paymentWindow(username);
+			break;
+		case 2:
+			//Clears all items from the cart.
+			cart.close();
+			cart.open("cart.csv", ios::out | ios::trunc); //clears database
+			if (!cart.is_open()) {
+				cout << "file not open";
+				return;
+			}
+			cout << "Cart has been cleared\n";
+			cart.close();
+			cartOpen(username);//re-opens cart function with the cart now cleared.
+			break;
+		case 3:
+			//Returns user to order menu.
+			cart.close();
 			return;
+			break;
+		default:
+			cout << "Please Choose a valid option.\n";
+			break;
 		}
-		cout << "Cart has been cleared\n";
-		cart.close();
-		cartOpen(username);//re-opens cart function with the cart now cleared.
-		break;
-	case 3:
-		cart.close();
-		orderMenu(username);
-		break;
-	}
+	} while (userChoice < 1 || userChoice > 3); //Loops through switch case until a valid choice is made.
 
 	cart.close();
 
 }
 
 void paymentWindow(string username) {
-	//retrieve username, cart information and userinputs and pushes into billing database.
+	//retrieve username, cart information and userinputs and pushes data into billing database.
 
-	cout << "paymentwindow\n\n\n";
+	system("cls");
+	cout << "\nPayment Window\n\n";
 	int userChoice;
 	fstream billingDataBase;
 	fstream cart;
+	char anyKey;
 
 	cart.open("cart.csv", ios::in); //cart outputs and stores data to be extracted and stored in billing database.
 	if (!cart.is_open()) {
@@ -544,6 +569,7 @@ void paymentWindow(string username) {
 	vector<float> totalCalc;
 	double totalPrice;
 
+	//pushes cart information into 'filecontent' vector.
 	string line, word;
 	vector<string> row;
 	vector<vector<string>> fileContent;
@@ -559,7 +585,7 @@ void paymentWindow(string username) {
 	}
 
 	cart.close();
-	cart.open("cart.csv", ios::out | ios::trunc); //clears cart
+	cart.open("cart.csv", ios::out | ios::trunc); //clears cart and closes it.
 	if (!cart.is_open()) {
 		cout << "file not open";
 		return;
@@ -575,153 +601,214 @@ void paymentWindow(string username) {
 	string date, childName, dietaryPref, paymentStatus;
 	int roomNumber;
 
+	//prompts user inputs to be stored in billingDataBase
 	cout << "\nEnter the date (dd/mm/yyyy): ";
 	cin >> date;
-	cout << "\nEnter the child you want to sent the order to: ";
+	cout << "\nEnter the child you want to send the order to: ";
 	cin >> childName;
 	cout << "\nEnter the child's room number: ";
 	cin >> roomNumber;
 	cout << "\nEnter any dietary prefences: ";
 	cin >> dietaryPref;
 
-	cout << "Do you want to pay now or later?\n";
-	cout << "1) Pay now: \n2) Pay later: ";
-	cin >> userChoice;
-
-	if (userChoice == 1) {
+	//Prompts user to decide whether to pay now or later.
+	do{
+		cout << "Do you want to pay now or later?\n";
+		cout << "1) Pay now: \n2) Pay later: ";
+		cin >> userChoice;
+		//assigns paymentStatus to 'paid' or 'unpaid' depending on userChoice.
+		switch (userChoice) {
+		case 1:
+			cout << "Payment complete.\n";
+			paymentStatus = "paid";
+			cout << "Press any key to exit\n";
+			cin >> anyKey;
+			break;
+		case 2:
+			cout << "Please complete your order in the Billing menu.\n\n";
+			paymentStatus = "unpaid";
+			break;
+		default:
+			cout << "Please select a valid option\n";
+			break;
+		}
+	} while (userChoice < 1 || userChoice > 2);
+	/*if (userChoice == 1) {
 		cout << "Payment complete.\n";
 		paymentStatus = "paid";
+		cout << "Press any key to exit\n";
+		cin >> anyKey;
 	}
 	else if (userChoice == 2) {
-		cout << "Please complete your order within the billing menu.\n\n";
+		cout << "Please complete your order in the Billing menu.\n\n";
 		paymentStatus = "unpaid";
-	}
+	}*/
 
+	//opens billingDataBase file.
 	billingDataBase.open("billingDataBase.csv", ios::app);
 	if (!billingDataBase.is_open()) {
 		cout << "file not open";
 		return;
 	}
 
+	//removes any user inputted commas be using the 'removeComma' function.
 	username = removeComma(username);
 	date = removeComma(date);
 	childName = removeComma(childName);
 	dietaryPref = removeComma(dietaryPref);
 
+	//pushes all required data into the billingDataBase
 	billingDataBase << username << "," << date << "," << childName << "," << roomNumber << "," << dietaryPref << "," << totalPrice << "," << paymentStatus << "\n";
 
 	billingDataBase.close();
+	//Sends user back to the main menu.
 	userMainMenu(username);
 }
 
-void feedbackForm(string username) {
-	int userChoice;
+ void feedbackForm(string username) {
+	char userChoice;
+	//opens the feedbackDataBase
 	fstream feedbackDataBase("feedbackDataBase.txt", ios::app);
 
 	cout << "****Feedback****\n\n";
-	string feedback;
+	string feedback = "bogus";
 
 	if (!feedbackDataBase.is_open()) {
 		cout << "file is not open\n";
 		return;
 	}
 
-	cout << "Write your feedback: \n";
-	std::getline (std::cin,feedback);
-	feedbackDataBase << feedback << "\n";
-	cout << "Thank you, your feedback has been sent.\n\n\n";
-	feedbackDataBase.close();
+		cout << "Please write your feedback: \n";
+		//'getline' function used to enable user inputted spacing when pushing to file.
+		
+		std::cin.ignore(INT_MAX, '\n');
+		getline(cin, feedback);
 
-	userMainMenu(username);
+		//pushes user feedback into file.
+		feedbackDataBase << username << "," << feedback << "\n";
+		cout << "Thank you, your feedback has been sent.\n\n\n";
+		feedbackDataBase.close();
+
+		cout << "Press any key to return to main menu\n";
+		cin >> userChoice;
+	
+	return;
 }
 
 void billingHistory(string username) {
 
-	cout << "\n\n****Billing****\n\n";
+	system("cls");
+	cout << "\n****Billing****\n\n";
 
 	int userChoice;
 
+	//outputs options to user.
 	cout << "Select an option\n";
 	cout << "1) Complete pending payment\n2) View billing history \n3) Return to main menu\n";
-	cin >> userChoice;
-
-	switch (userChoice) {
-	case 1:
-		paymentStatus(username);
-		break;
-	case 2:
-
-		break;
-	case 3:
-		userMainMenu(username);
-		break;
-	}
+	do{
+		cin >> userChoice;
+		switch (userChoice) {
+		case 1:
+			//Takes user to view their payment status 
+			paymentStatus(username);
+			break;
+		case 2:
+			//Takes user to view their billing history
+			userBillingHistory(username);
+			break;
+		case 3:
+			//Returns user to main menu.
+			userMainMenu(username);
+			break;
+		default:
+			cout << "Please choose a valid option.\n";
+		}
+	} while (userChoice < 1 || userChoice > 3);
 }
 
 void userBillingHistory(string username) {
+	system("cls");
 	cout << "Your billing history: \n\n";
-
+	char userChoice;
+	//Extracts data from billingDataBase file and pushes it int 'filecontent' vector using csvToVector function.
 	vector<vector<string>> fileContent = csvToVector("billingDataBase");
 
+	//Iterates through 'filecontent' and checks for column matching username.
 	for (int i = 0; i < fileContent.size(); i++) {
 		if (fileContent[i][0] == username) {
+			//Outputs user's billing history.
 			cout << "Date: " << fileContent[i][1] << "\tAmount spent: " << fileContent[i][5] << "\tStatus: " << fileContent[i][6] << endl;
 		}
 	}
+	//Prompts user to go back to main menu when user is ready.
+	cout << "\nPress any key to go back\n";
+	cin >> userChoice;
+	billingHistory(username);
 }
 
 void paymentStatus(string username) {
 
+	system("cls");
 				string paymentStatus;
 				float amountOwed;
 				int userChoice;
-				username = "juzzitube";
+				char anyKey;
+
 	
+				//Extracts billingDataBase file and pushes it into 'filecontent' vector using 'csvToVector' function.
 				vector<vector<string>> fileContent = csvToVector("billingDataBase");
-				for (int i = 0; i < fileContent.size(); i++) {
-					for (int j = 0; j < fileContent[i].size(); j++) {
-						cout << fileContent[i][j] << "\t";
-					}
-					std::cout << "\n";
-				}
 
-
+				//iterates through fileContent until a collumn matches the user's 'username'.
 				for (int i = 0; i < fileContent.size(); i++) {
 					for (int j = 0; j < fileContent.at(i).size(); j++) {
 
-						if (fileContent[i][2] == username) {
-							cout << fileContent[i][6];
+						if (fileContent[i][0] == username) {
+
+							//assigns the user's paymentstatus in vector to the paymentStatus variable.
 							paymentStatus = fileContent[i][6];
-							cout << paymentStatus;
-						}
-						if (paymentStatus == "unpaid") {
-							cout << "Your payment status is unpaid. You owe: " << fileContent[i][5] << "$\n";
-							cout << "Do you want to pay now?\n";
-						}
 
+							//checks paymentstatus and prompts user with 2 scenario's depending on whether its 'unpaid' or 'paid'
+							if (paymentStatus == "unpaid") {
 
-						do {
-							cout << "1) Yes\n2) No: ";
-							cin >> userChoice;
-							switch (userChoice) {
-							case 1:
-								paymentStatus = "paid";
-								fileContent[i][6] = paymentStatus;
-								cout << "Payment complete. Your payment status has been updated.\n";
-								clearFile("billingDataBase");
-								beamVectorToFile(fileContent, "billingDataBase");
-								break;
-							case 2:
-								cout << "Your payment status will remain unpaid\n";
-								break;
-							default:
-								cout << "Please select a valid option\n";
-								break;
+								//outputs options to user if 'unpaid'.
+								cout << "Your payment status is unpaid. You owe: " << fileContent[i][5] << "$\n";
+								cout << "Do you want to pay now?\n";
+								cout << "1) Yes\n2) No: ";
+								cin >> userChoice;
+
+								do {
+									switch (userChoice) {
+										//if user chooses to pay, paymentstatus is changed and replaces old status in the 'fileContent'
+									case 1:
+										paymentStatus = "paid";
+										fileContent[i][6] = paymentStatus;
+										cout << "Payment complete. Your payment status has been updated.\n";
+										clearFile("billingDataBase");
+										beamVectorToFile(fileContent, "billingDataBase");
+										break;
+									case 2:
+										//outputs message to user if they choose not to pay.
+										cout << "Your payment status will remain unpaid\n";
+										break;
+									default:
+										cout << "Please select a valid option\n";
+										break;
+									}
+								} while (userChoice < 0 || userChoice > 2);
 							}
-						} while (userChoice < 0 || userChoice > 2);
+
+							//Outputs message to user if they're already paid and prompts them to return to billing menu.
+							else if (paymentStatus == "paid") {
+								cout << "You have no outstanding payments to pay\n\n";
+								cout << "Press any key to go back.\n";
+								cin >> anyKey;
+								billingHistory(username);
+							}
+						}
 					}
-					}
-				}
+				}				
+}
+				
 
 //void editMenu() {
 //	int i = 1, input;

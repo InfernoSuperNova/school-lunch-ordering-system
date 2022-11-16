@@ -1,4 +1,3 @@
 ﻿  School Lunch ordering system.cpp
-C:\Users\270211292\Documents\Github\school-lunch-ordering-system\School Lunch ordering system\School Lunch ordering system.cpp(618,6): warning C4101: 'userChoice': unreferenced local variable
-C:\Users\270211292\Documents\Github\school-lunch-ordering-system\School Lunch ordering system\School Lunch ordering system.cpp(676,11): warning C4101: 'amountOwed': unreferenced local variable
+C:\Users\270211292\Documents\Github\school-lunch-ordering-system\School Lunch ordering system\School Lunch ordering system.cpp(753,11): warning C4101: 'amountOwed': unreferenced local variable
   School Lunch ordering system.vcxproj -> C:\Users\270211292\Documents\Github\school-lunch-ordering-system\x64\Debug\School Lunch ordering system.exe
