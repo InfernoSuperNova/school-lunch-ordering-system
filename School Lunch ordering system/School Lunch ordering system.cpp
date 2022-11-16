@@ -11,7 +11,7 @@
 using std::string;
 using std::cout;
 using std::cin;
-using std::ios;           
+using std::ios;
 using std::vector;
 using std::fstream;
 using std::stringstream;
@@ -37,43 +37,67 @@ void beamStringToFile(string input, string fileToBeamTo);
 
 void beamVectorToFile(vector<vector<string>> input, string filename);
 
+void copyFileContentToFile(string filenameFrom, string filenameTo);
+
+void backupFile(string filename);
+
+void restoreFileFromBackup(string filename);
+
 void clearFile(string filename);
 
 void login();
 
+//function to convert the CSV database to a 2D vector of strings (and return)
+//Arguments: Name of file to open, without extension
+//Returns: Vector conversion of CSV document
 vector<vector<string>> csvToVector(string fileName);
 
 void userMainMenu();
+
+void adminMainMenu();
+
+void dailySaleReports();
+
+void monthlySaleReports();
 
 void orderMenu();
 
 void paymentWindow();
 
 void feedbackForm();
-	
+
 void billingHistory();
 
 void cartOpen();
 
-void paymentStatus();
+void paymentStatus(string username);
 
 void editMenu();
 
+void viewFeedback();
+
 int main()
 {
-
-	editMenu();
+	bool loop = true;
 	int selection;
-	cout << "oi mate ya wanna register(0) or login(1) bro???\n";
-	cin >> selection;
-	switch (selection) {
-	case 0:
-		registerUser();
-		break;
-	case 1:
-		login();
-		break;
+	while (true) {
+		cout << "Would you like to:\n(1)Register\n(2)Login\n(3)Quit\n";
+		cin >> selection;
+		switch (selection) {
+		case 1:
+			registerUser();
+			break;
+		case 2:
+			login();
+			break;
+		case 3:
+			return 0;
+		default:
+			cout << "\nThat is not a valid response!\n";
+		}
 	}
+	
+	
 	//paymentStatus();
 
 }
@@ -182,15 +206,7 @@ string removeComma(string input) {
 	}
 	return output;
 }
-//name = "bo,b"
-//stuff = "t,est"
-//stuff2 = "te,s,t2"
-//food = "cho,co,la,te"
-//
-//output = removeComma(name);
-//output = appendForTable(output, stuff);
-//"bob,test"
-//output = appendForTable(output, stuff2)
+
 
 //Appends added to the end of toBeAddedTo, while removing comma's from added
 string appendForTable(string toBeAddedTo, string added) {
@@ -224,9 +240,28 @@ void clearFile(string filename) {
 void beamVectorToFile(vector<vector<string>> input, string filename) {
 	string output;
 	for (vector<string> row : input) {
+
 		output = appendForTable(row.at(0), row.at(1));
+		output = row.at(0);
+		for (int i = 1; i < row.size(); i++) {
+			output = output + "," + row.at(i);
+		}
 		beamStringToFile(output, filename);
 	}
+}
+
+void copyFileContentToFile(string filenameFrom, string filenameTo) {
+	vector<vector<string>> temp = csvToVector(filenameFrom);
+	beamVectorToFile(temp, filenameTo);
+}
+
+void backupFile(string filename) {
+	clearFile(filename + "_backup");
+	copyFileContentToFile(filename, filename + "_backup");
+}
+
+void restoreFileFromBackup(string filename) {
+	copyFileContentToFile(filename + "_backup", filename);
 }
 //--------------------------------------------------------------------------------------------------------------
 
@@ -235,7 +270,7 @@ void beamVectorToFile(vector<vector<string>> input, string filename) {
 //Arguments: Name of file to open, without extension
 //Returns: Vector conversion of CSV document
 vector<vector<string>> csvToVector(string fileName) {
-	
+
 	string line, word;
 	vector<string> row; //Stores data of current row
 	vector<vector<string>> output; //2D vector for storing 
@@ -292,7 +327,7 @@ void login() {
 				break;
 			case 1:
 				cout << "logged in as admin" << '\n';
-				// run code for admin functionality
+				adminMainMenu();
 			}
 		}
 	}
@@ -331,6 +366,151 @@ void userMainMenu() {
 			break;
 		}
 	} while (userChoice != 4);
+}
+
+void adminMainMenu() {
+	int userChoice = 0;
+	while (userChoice < 1 || userChoice > 5) {
+		
+		while (true) {
+			cout << "Select option:\n1)View daily sale reports\n2)View monthy sale reports\n3)Edit menu options\n4)View Feedback\n5)Logout\n";
+			cin >> userChoice;
+			switch (userChoice) {
+			case 1:
+				dailySaleReports();
+				break;
+			case 2:
+				monthlySaleReports();
+				break;
+			case 3:
+				editMenu();
+				break;
+			case 4:
+				viewFeedback();
+				break;
+			case 5:
+				return;
+			default:
+				cout << "Please select a valid option\n";
+				break;
+			}
+		}
+	}
+
+}
+
+void dailySaleReports() {
+	bool check = false;
+	int userChoice;
+	string dateSelected;
+	vector<vector<string>> database = csvToVector("billingDataBase");
+	vector<string> datesToPrint; //stores the applicable dates that can be printed out
+
+	//loops through dates and adds them to the applicable dates vector
+	for (vector<string> row : database) {
+		check = false;
+		//loop through dates to print
+		for (int i = 0; i < datesToPrint.size(); i++) {
+			//if the current item in rows matches any of the stored items in datesToPrint...
+			if (row.at(1) == datesToPrint.at(i)) {
+				//set check to true
+				check = true;
+			}
+		}
+		//If the check switch was never triggered, then
+		if (check == false) {
+			//add the date to the list of dates to print
+			datesToPrint.push_back(row.at(1));
+		}
+	}
+	//all of this just to remove duplicate entries
+
+
+	//date printing
+	cout << "Please select a date: \n";
+	for (int i = 0; i < datesToPrint.size(); i++) {
+		cout << "\n" << i + 1 << ") " << datesToPrint.at(i);
+	}
+	cout << "\nSelection: ";
+
+	//date selection
+	cin >> userChoice;
+	for (int i = 0; i < datesToPrint.size(); i++) {
+		if (userChoice == i + 1) {
+			dateSelected = datesToPrint.at(i);
+		}
+	}
+	dateSelected = datesToPrint.at(userChoice - 1);
+
+	//info printing
+	for (vector<string> row : database) {
+
+		//cout << row.at(1) << " == " << dateSelected;
+		if (row.at(1) == dateSelected) {
+			cout << "\n";
+			for (int i = 0; i < row.size(); i++) {
+				cout << row.at(i) << "\t";
+			}
+		}
+	}
+	cout << "\n\n";
+}
+
+void monthlySaleReports() {
+	bool check = false;
+	int userChoice;
+	string dateSelected;
+	vector<vector<string>> database = csvToVector("billingDataBase");
+	vector<string> datesToPrint; //stores the applicable dates that can be printed out
+
+	//loops through dates and adds them to the applicable dates vector
+	for (vector<string> row : database) {
+		check = false;
+		//loop through dates to print
+		for (int i = 0; i < datesToPrint.size(); i++) {
+			//if the current item in rows matches any of the stored items in datesToPrint...
+			//substring(3, 7) creates a new string starting at index 3 and continuing for 7 chars (IE, removing the day)
+			if (row.at(1).substr(3, 7) == datesToPrint.at(i)) {
+				//set check to true
+				check = true;
+			}
+		}
+		//If the check switch was never triggered, then
+		if (check == false) {
+			//add the date to the list of dates to print
+			datesToPrint.push_back(row.at(1).substr(3, 7));
+		}
+	}
+	//all of this just to remove duplicate entries
+
+
+	//date printing
+	cout << "Please select a date: \n";
+	for (int i = 0; i < datesToPrint.size(); i++) {
+		cout << "\n" << i + 1 << ") " << datesToPrint.at(i);
+	}
+	cout << "\nSelection: ";
+
+	//date selection
+	cin >> userChoice;
+	for (int i = 0; i < datesToPrint.size(); i++) {
+		if (userChoice == i + 1) {
+			dateSelected = datesToPrint.at(i);
+		}
+	}
+
+	//info printing
+	for (vector<string> row : database) {
+
+		//cout << row.at(1) << " == " << dateSelected;
+		if (row.at(1).substr(3, 7) == dateSelected) {
+			cout << "\n";
+			for (int i = 0; i < row.size(); i++) {
+				cout << row.at(i) << "\t";
+			}
+		}
+	}
+	cout << "\n\n";
 }
 
 void orderMenu() {
@@ -393,7 +573,7 @@ void orderMenu() {
 		cin >> userChoice;
 		menuDataBase.close();
 
-		cart.open("cart.csv", ios::out | ios::app | ios::in | ios::beg );
+		cart.open("cart.csv", ios::out | ios::app | ios::in | ios::beg);
 
 		switch (userChoice) {
 		case 1:
@@ -515,7 +695,7 @@ void paymentWindow() {
 	int userChoice;
 	fstream billingDataBase;
 	fstream cart;
-		
+
 	cart.open("cart.csv", ios::in); //cart outputs and stores data to be extracted and stored in billing database.
 	if (!cart.is_open()) {
 		cout << "file not open";
@@ -581,16 +761,16 @@ void paymentWindow() {
 	}
 
 	billingDataBase.open("billingDataBase.csv", ios::app);
-if (!billingDataBase.is_open()) {
-	cout << "file not open";
-	return;
-}
+	if (!billingDataBase.is_open()) {
+		cout << "file not open";
+		return;
+	}
 
-username = removeComma(username);
-date = removeComma(date);
-childName = removeComma(childName);
-billingDataBase << username << "," << date << "," << childName << "," << roomNumber << "," << dietaryPref << "," << totalPrice << "," << paymentStatus << "\n";
-		
+	username = removeComma(username);
+	date = removeComma(date);
+	childName = removeComma(childName);
+	billingDataBase << username << "," << date << "," << childName << "," << roomNumber << "," << dietaryPref << "," << totalPrice << "," << paymentStatus << "\n";
+
 	billingDataBase.close();
 	userMainMenu();
 }
@@ -627,9 +807,9 @@ void billingHistory() {
 
 	switch (userChoice) {
 	case 1:
-		paymentStatus();
+		paymentStatus("juzzitube");
 		break;
-	case 2: 
+	case 2:
 
 		break;
 	case 3:
@@ -638,61 +818,63 @@ void billingHistory() {
 	}
 }
 
-void paymentStatus() {
+void paymentStatus(string username) {
 
-	string username;
+
+
 	string paymentStatus;
 	float amountOwed;
 	int userChoice;
 
-	fstream billingDataBase;
-	billingDataBase.open("billingDataBase.csv", ios::in | ios::beg);
-
-	string line, word;
-	vector<string> row;
-	vector <vector<string>> fileContent;
-
-	if (!billingDataBase.is_open()) {
-		cout << "File failed to open\n";
-	}
-
-	while (getline(billingDataBase, line, '\n')) {
-		row.clear();
-		stringstream stream(line);
-		while (getline(stream, word, ',')) {
-			row.push_back(word);
-		}
-		fileContent.push_back(row);
-	}
-
-	cout << "\nEnter your username: ";
-	cin >> username;
-
-	for (int i = 0; i < fileContent.size(); i++) {
-		if (fileContent[i][0] == username) {
-			paymentStatus = fileContent[i][6];
-			if (paymentStatus == "unpaid") {
-				cout << "Your payment status is unpaid. You owe: " << fileContent[i][5] << "$\n";
-				cout << "Do you want to pay now?\n";
-				cout << "1) Yes\n2) No: ";
-				cin >> userChoice;
-
-				if (userChoice == 1) {
-						
-				}
-			}
-		}
-	}
-
-	billingDataBase.close();
 
 
+	vector<vector<string>> fileContent = csvToVector("billingDataBase");
+	clearFile("billingDataBase");
+	backupFile("billingDataBase");
+	restoreFileFromBackup("billingDataBase");
+
+
+	//for (int i = 0; i < fileContent.size(); i++) {
+	//	if (fileContent[i][0] == username) {
+	//		paymentStatus = fileContent[i][6];
+	//	}
+	//	if (paymentStatus == "unpaid") {
+
+
+
+	//		cout << "Your payment status is unpaid. You owe: " << fileContent[i][5] << "$\n";
+	//		cout << "Do you want to pay now?\n";
+	//		cout << "1) Yes\n2) No: ";
+	//	}
+
+
+
+	//	do {
+	//		cin >> userChoice;
+	//		switch (userChoice) {
+	//		case 1:
+	//			paymentStatus = "paid";
+	//			fileContent[i][6] = paymentStatus;
+	//			cout << "Payment complete. Your payment status has been updated.\n";
+	//			clearFile("billingDataBase");
+	//			beamVectorToFile(fileContent, "billingDataBase");
+	//			break;
+	//		case 2:
+	//			cout << "Your payment status will remain unpaid\n";
+	//			break;
+	//		default:
+	//			cout << "Please select a valid option\n";
+	//			break;
+	//		}
+	//	} while (userChoice != 1 | 2);
+	//}
 }
 
 void editMenu() {
 	int i = 1, input;
 	string newVal;
 	vector<vector<string>> menu = csvToVector("menuDataBase");
+
 	cout << "Current menu: \n";
 	for (vector<string> row : menu) {//FOR loop that iterates through each line of the vector array
 		cout << "(" << i++ << ") " << row.at(0) << "\t$" << row.at(1) << "\n";
@@ -719,7 +901,7 @@ void editMenu() {
 					clearFile("menuDataBase");
 					beamVectorToFile(menu, "menuDataBase");
 					break;
-					
+
 				case 2:
 					cout << "Please enter a new price (excluding $ character): ";
 					cin >> newVal;
@@ -730,7 +912,7 @@ void editMenu() {
 					break;
 				}
 			}
-			i++; 
+			i++;
 		}
 		break;
 	case 2:
@@ -738,12 +920,40 @@ void editMenu() {
 		return;
 	}
 
-	
+
 }
 
+//Outputs the feedback file into the console
+//Arguments: none
+//Returns: nothing
+void viewFeedback() {
+	char input = 'n';
+	std::ifstream feedback("feedbackDataBase.txt");
+	if (!feedback.is_open()) {
+		cout << "Error (feedback()), file is not open, exiting!\n";
+		return;
 
+	}
+	//outputs EVERYTHING in the file
+	cout << feedback.rdbuf();
+	while (true) {
+		cout << "\n\nClear feedback? y/n: ";
+		cin >> input;
+		switch (input) {
+		case 'y':
+			feedback.close();
+			//clear the file
+			feedback.open("feedbackDataBase.txt", ios::out | ios::trunc);
+			feedback.close();
+			return;
+		case 'n':
+			feedback.close();
+			return;
+		default:
+			cout << "That is not a valid response!\n";
+			break;
+		}
+	}
+	
 
-
-
-
-
+}

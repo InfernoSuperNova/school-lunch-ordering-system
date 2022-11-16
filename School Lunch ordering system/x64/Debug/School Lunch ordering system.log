@@ -1,4 +1,5 @@
 ﻿  School Lunch ordering system.cpp
-C:\Users\270155294\OneDrive - UP Education\Desktop\foobar_group_assignment_103\school-lunch-ordering-system\School Lunch ordering system\School Lunch ordering system.cpp(599,6): warning C4101: 'userChoice': unreferenced local variable
-C:\Users\270155294\OneDrive - UP Education\Desktop\foobar_group_assignment_103\school-lunch-ordering-system\School Lunch ordering system\School Lunch ordering system.cpp(645,8): warning C4101: 'amountOwed': unreferenced local variable
-  School Lunch ordering system.vcxproj -> C:\Users\270155294\OneDrive - UP Education\Desktop\foobar_group_assignment_103\school-lunch-ordering-system\x64\Debug\School Lunch ordering system.exe
+C:\Users\270155294\OneDrive - UP Education\Documents\school-lunch-ordering-system\school-lunch-ordering-system\School Lunch ordering system\School Lunch ordering system.cpp(779,6): warning C4101: 'userChoice': unreferenced local variable
+C:\Users\270155294\OneDrive - UP Education\Documents\school-lunch-ordering-system\school-lunch-ordering-system\School Lunch ordering system\School Lunch ordering system.cpp(827,6): warning C4101: 'userChoice': unreferenced local variable
+C:\Users\270155294\OneDrive - UP Education\Documents\school-lunch-ordering-system\school-lunch-ordering-system\School Lunch ordering system\School Lunch ordering system.cpp(826,8): warning C4101: 'amountOwed': unreferenced local variable
+  School Lunch ordering system.vcxproj -> C:\Users\270155294\OneDrive - UP Education\Documents\school-lunch-ordering-system\school-lunch-ordering-system\x64\Debug\School Lunch ordering system.exe
